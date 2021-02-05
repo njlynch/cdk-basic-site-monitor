@@ -9,12 +9,32 @@ import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as sns from 'aws-cdk-lib/aws-sns';
 import * as subscriptions from 'aws-cdk-lib/aws-sns-subscriptions';
 
+/**
+ * Properties for creating a BasicSiteMonitor
+ */
 export interface BasicSiteMonitorProps {
+  /**
+   * The URL to monitor via a regular GET request.
+   */
   readonly url: string;
+  /**
+   * The friendly name of the site for notifications and naming.
+   */
   readonly siteName: string;
+  /**
+   * List of emails to send notifications to when the site goes down or recovers.
+   */
   readonly notificationEmails: string[];
 }
 
+/**
+ * Very simple site monitoring solution that uses a Lambda job to make a GET request
+ * to a URL on a regular basis (currently once a minute), and alarm if the request
+ * fails multiple times within the monitoring period.
+ * Email notifications are sent on repeated failure and recovery.
+ *
+ * At 1 request per minute, this easily fits within the AWS free tier limit.
+ */
 export class BasicSiteMonitor extends cdk.Construct {
 
   private static _lambdaCodeTemplate?: string;
